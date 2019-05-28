@@ -22,7 +22,7 @@
 
 #pragma mark -
 
-@interface MBFingerTipOverlayWindow : UIWindow
+@interface MBFingerTipOverlayViewController : UIViewController
 @end
 
 #pragma mark -
@@ -109,12 +109,13 @@
 {
     if ( ! _overlayWindow)
     {
-        _overlayWindow = [[MBFingerTipOverlayWindow alloc] initWithFrame:self.frame];
+        _overlayWindow = [[UIWindow alloc] initWithFrame:self.frame];
         
         _overlayWindow.userInteractionEnabled = NO;
         _overlayWindow.windowLevel = UIWindowLevelStatusBar;
         _overlayWindow.backgroundColor = [UIColor clearColor];
         _overlayWindow.hidden = NO;
+        _overlayWindow.rootViewController = [[MBFingerTipOverlayViewController alloc] init];
     }
     
     return _overlayWindow;
@@ -383,19 +384,12 @@
 
 #pragma mark -
 
-@implementation MBFingerTipOverlayWindow
+@implementation MBFingerTipOverlayViewController
 
-// UIKit tries to get the rootViewController from the overlay window. Use the Fingertips window instead. This fixes
-// issues with status bar behavior, as otherwise the overlay window would control the status bar.
-
-- (UIViewController *)rootViewController
+- (UIStatusBarStyle)preferredStatusBarStyle
 {
-    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings)
-    {
-        return [evaluatedObject isKindOfClass:[MBFingerTipWindow class]];
-    }];
-    UIWindow *mainWindow = [[[[UIApplication sharedApplication] windows] filteredArrayUsingPredicate:predicate] firstObject];
-    return mainWindow.rootViewController ?: [super rootViewController];
+    return [UIApplication sharedApplication].keyWindow.rootViewController.preferredStatusBarStyle;
 }
 
 @end
+
